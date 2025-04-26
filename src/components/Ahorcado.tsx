@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -13,20 +14,35 @@ const Ahorcado = () => {
   const [intentosRestantes, setIntentosRestantes] = useState<number>(6); // Intentos fallidos permitidos
   const [palabraMostrada, setPalabraMostrada] = useState<string[]>([]); // Palabra mostrada con guiones
   const [estadoJuego, setEstadoJuego] = useState<'jugando' | 'victoria' | 'derrota'>('jugando'); // Estado actual del juego
+  const [isMuted, setIsMuted] = useState<boolean>(false); // Estado de silencio
   const {
     toast
   } = useToast();
   const soundsManager = useRef<SoundsManager | null>(null);
+  
+  // Efecto para inicializar el gestor de sonidos
   useEffect(() => {
+    console.log("Inicializando gestor de sonidos...");
     soundsManager.current = new SoundsManager();
-    soundsManager.current.startBackgroundMusic(); // Iniciamos la música de fondo
+    
+    // Iniciar música después de un corto retraso para asegurar que el contexto de audio esté listo
+    setTimeout(() => {
+      console.log("Intentando reproducir música de fondo...");
+      soundsManager.current?.startBackgroundMusic();
+    }, 1000);
+    
     return () => {
+      console.log("Limpiando gestor de sonidos...");
+      soundsManager.current?.stopBackgroundMusic();
       soundsManager.current?.unload();
     };
   }, []);
+  
+  // Efecto para iniciar el juego al cargar
   useEffect(() => {
     iniciarJuego();
   }, []);
+  
   const iniciarJuego = () => {
     const palabraAleatoria = palabras[Math.floor(Math.random() * palabras.length)];
     setPalabraSecreta(palabraAleatoria.toUpperCase());
@@ -35,15 +51,18 @@ const Ahorcado = () => {
     setEstadoJuego('jugando');
     setPalabraMostrada(Array(palabraAleatoria.length).fill('_'));
   };
+  
   const manejarLetra = (letra: string) => {
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
     
     // Reproducir sonido de tecla presionada
+    console.log(`Tecla presionada: ${letra}`);
     soundsManager.current?.playSound('tecla');
     
     const nuevasLetrasAdivinadas = new Set(letrasAdivinadas);
     nuevasLetrasAdivinadas.add(letra);
     setLetrasAdivinadas(nuevasLetrasAdivinadas);
+    
     if (palabraSecreta.includes(letra)) {
       const nuevaPalabraMostrada = [...palabraMostrada];
       for (let i = 0; i < palabraSecreta.length; i++) {
@@ -53,6 +72,7 @@ const Ahorcado = () => {
       }
       setPalabraMostrada(nuevaPalabraMostrada);
       soundsManager.current?.playSound('correcto');
+      
       if (!nuevaPalabraMostrada.includes('_')) {
         setEstadoJuego('victoria');
         soundsManager.current?.playSound('victoria');
@@ -66,6 +86,7 @@ const Ahorcado = () => {
       soundsManager.current?.playSound('incorrecto');
       const nuevosIntentosRestantes = intentosRestantes - 1;
       setIntentosRestantes(nuevosIntentosRestantes);
+      
       if (nuevosIntentosRestantes === 0) {
         setEstadoJuego('derrota');
         soundsManager.current?.playSound('derrota');
@@ -78,6 +99,18 @@ const Ahorcado = () => {
       }
     }
   };
+  
+  // Función para alternar el estado de silencio
+  const toggleMute = () => {
+    if (isMuted) {
+      soundsManager.current?.unmute();
+      soundsManager.current?.startBackgroundMusic();
+    } else {
+      soundsManager.current?.mute();
+      soundsManager.current?.stopBackgroundMusic();
+    }
+    setIsMuted(!isMuted);
+  };
 
   return <Card className="w-full max-w-6xl p-6 bg-white shadow-lg rounded-2xl">
       <div className="text-center mb-6">
@@ -85,6 +118,14 @@ const Ahorcado = () => {
         <p className="text-gray-600">
           Adivina la palabra letra por letra. ¡Tienes 6 intentos!
         </p>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={toggleMute} 
+          className="mt-2"
+        >
+          {isMuted ? '🔇 Activar Sonido' : '🔊 Silenciar'}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
