@@ -19,6 +19,7 @@ const Ahorcado = () => {
   const soundsManager = useRef<SoundsManager | null>(null);
   useEffect(() => {
     soundsManager.current = new SoundsManager();
+    soundsManager.current.startBackgroundMusic(); // Iniciamos la música de fondo
     return () => {
       soundsManager.current?.unload();
     };
@@ -36,6 +37,10 @@ const Ahorcado = () => {
   };
   const manejarLetra = (letra: string) => {
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
+    
+    // Reproducir sonido de tecla presionada
+    soundsManager.current?.playSound('tecla');
+    
     const nuevasLetrasAdivinadas = new Set(letrasAdivinadas);
     nuevasLetrasAdivinadas.add(letra);
     setLetrasAdivinadas(nuevasLetrasAdivinadas);
