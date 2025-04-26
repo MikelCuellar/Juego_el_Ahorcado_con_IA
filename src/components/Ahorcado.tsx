@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -10,26 +9,24 @@ import CategorySelector from '@/components/CategorySelector';
 import { getRandomWordByCategory } from '@/utils/WordService';
 
 const Ahorcado = () => {
-  const [palabraSecreta, setPalabraSecreta] = useState<string>(''); // Palabra a adivinar
-  const [letrasAdivinadas, setLetrasAdivinadas] = useState<Set<string>>(new Set()); // Letras ya intentadas
-  const [intentosRestantes, setIntentosRestantes] = useState<number>(6); // Intentos fallidos permitidos
-  const [palabraMostrada, setPalabraMostrada] = useState<string[]>([]); // Palabra mostrada con guiones
-  const [estadoJuego, setEstadoJuego] = useState<'jugando' | 'victoria' | 'derrota'>('jugando'); // Estado actual del juego
-  const [isMuted, setIsMuted] = useState<boolean>(false); // Estado de silencio
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Estado de carga
-  const [categoria, setCategoria] = useState<string>("animales"); // Categoría seleccionada
-  
+  const [palabraSecreta, setPalabraSecreta] = useState<string>('');
+  const [letrasAdivinadas, setLetrasAdivinadas] = useState<Set<string>>(new Set());
+  const [intentosRestantes, setIntentosRestantes] = useState<number>(6);
+  const [palabraMostrada, setPalabraMostrada] = useState<string[]>([]);
+  const [estadoJuego, setEstadoJuego] = useState<'jugando' | 'victoria' | 'derrota'>('jugando');
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [categoria, setCategoria] = useState<string>("");
+
   const {
     toast
   } = useToast();
   const soundsManager = useRef<SoundsManager | null>(null);
   
-  // Efecto para inicializar el gestor de sonidos
   useEffect(() => {
     console.log("Inicializando gestor de sonidos...");
     soundsManager.current = new SoundsManager();
     
-    // Iniciar música después de un corto retraso para asegurar que el contexto de audio esté listo
     setTimeout(() => {
       console.log("Intentando reproducir música de fondo...");
       soundsManager.current?.startBackgroundMusic();
@@ -42,13 +39,21 @@ const Ahorcado = () => {
     };
   }, []);
   
-  // Fetch word when category changes or game restarts
   const fetchPalabraSecreta = async () => {
+    if (!categoria.trim()) {
+      toast({
+        title: "Error",
+        description: "Por favor, ingresa una categoría antes de comenzar",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const palabra = await getRandomWordByCategory(categoria);
       setPalabraSecreta(palabra);
-      setIntentosRestantes(Math.min(palabra.length, 12)); // Set attempts to word length, max 12
+      setIntentosRestantes(Math.min(palabra.length, 12));
       setPalabraMostrada(Array(palabra.length).fill('_'));
       setLetrasAdivinadas(new Set());
       setEstadoJuego('jugando');
@@ -64,7 +69,6 @@ const Ahorcado = () => {
     }
   };
   
-  // Efecto para iniciar el juego al cargar o cambiar categoría
   useEffect(() => {
     if (categoria) {
       fetchPalabraSecreta();
@@ -74,7 +78,6 @@ const Ahorcado = () => {
   const manejarLetra = (letra: string) => {
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
     
-    // Reproducir sonido de tecla presionada
     console.log(`Tecla presionada: ${letra}`);
     soundsManager.current?.playSound('tecla');
     
@@ -119,7 +122,6 @@ const Ahorcado = () => {
     }
   };
   
-  // Función para alternar el estado de silencio
   const toggleMute = () => {
     if (isMuted) {
       soundsManager.current?.unmute();
