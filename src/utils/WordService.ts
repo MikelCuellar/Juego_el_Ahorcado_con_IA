@@ -18,7 +18,8 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
   }
 
   try {
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + apiKey, {
+    // La URL correcta para la API Gemini
+    const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=' + apiKey, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -34,14 +35,22 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
 
     const data = await response.json();
     
-    if (!response.ok || !data.candidates?.[0]?.content?.parts?.[0]?.text) {
+    if (!response.ok) {
+      console.error("Error API response:", data);
       throw new Error('Error al obtener la palabra');
+    }
+    
+    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      console.error("Formato de respuesta inesperado:", data);
+      throw new Error('Formato de respuesta inesperado');
     }
 
     let word = data.candidates[0].content.parts[0].text
       .toLowerCase()
       .trim()
       .replace(/[^a-záéíóúñ]/g, '');
+
+    console.log("Palabra obtenida:", word);
 
     // Verificar longitud
     if (word.length > 12) {
