@@ -1,46 +1,56 @@
 
 import { toast } from "@/components/ui/use-toast";
-import { pipeline } from "@huggingface/transformers";
 
-let textGenerator: any = null;
+let apiKey: string | null = null;
 
-const initializeModel = async () => {
-  if (!textGenerator) {
-    try {
-      textGenerator = await pipeline(
-        'text-generation',
-        'Xenova/gpt2-spanish',
-        { device: 'cpu' }
-      );
-    } catch (error) {
-      console.error("Error initializing model:", error);
-      throw new Error("No se pudo inicializar el modelo");
-    }
-  }
-  return textGenerator;
+export const setApiKey = (key: string) => {
+  apiKey = key;
 };
 
 export const getRandomWordByCategory = async (category: string): Promise<string> => {
+  if (!apiKey) {
+    toast({
+      title: "Error",
+      description: "Por favor, ingresa una API Key de Google Gemini",
+      variant: "destructive"
+    });
+    return "ahorcado";
+  }
+
   try {
-    const generator = await initializeModel();
-    
-    const prompt = `Dame 1, una y solo una palabra de no mas de 12 letras y no menos de 6, relacionadas con el tema ${category}`;
-    const result = await generator(prompt, {
-      max_new_tokens: 20,
-      temperature: 0.7,
-      do_sample: true,
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + apiKey, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `Dame una palabra en español de no más de 12 letras y no menos de 6, relacionada con ${category}. IMPORTANTE: Solo devuelve la palabra, sin ningún otro texto ni explicación.`
+          }]
+        }]
+      })
     });
 
-    let word = result[0].generated_text
-      .split(' ')
-      .pop()
-      ?.toLowerCase()
-      .trim()
-      .replace(/[^a-z]/g, '') || 'ahorcado';
+    const data = await response.json();
+    
+    if (!response.ok || !data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      throw new Error('Error al obtener la palabra');
+    }
 
-    // Verificar longitud y caracteres válidos
+    let word = data.candidates[0].content.parts[0].text
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-záéíóúñ]/g, '');
+
+    // Verificar longitud
     if (word.length > 12) {
       word = word.substring(0, 12);
+    }
+
+    // Si la palabra es muy corta, usar palabra por defecto
+    if (word.length < 6) {
+      return "ahorcado";
     }
 
     // Remover tildes y caracteres especiales

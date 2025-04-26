@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -6,8 +5,10 @@ import Teclado from '@/components/Teclado';
 import Dibujo from '@/components/Dibujo';
 import CategorySelector from '@/components/CategorySelector';
 import GameStatus from '@/components/GameStatus';
+import ApiKeyInput from '@/components/ApiKeyInput';
 import { useAhorcadoGame } from '@/hooks/useAhorcadoGame';
 import { useAhorcadoSounds } from '@/hooks/useAhorcadoSounds';
+import { setApiKey } from '@/utils/WordService';
 
 const Ahorcado = () => {
   const {
@@ -24,6 +25,10 @@ const Ahorcado = () => {
   } = useAhorcadoGame();
 
   const { isMuted, soundsManager, toggleMute } = useAhorcadoSounds();
+
+  const handleApiKeySet = (key: string) => {
+    setApiKey(key);
+  };
 
   return (
     <Card className="w-full max-w-6xl p-6 bg-white shadow-lg rounded-2xl">
@@ -42,6 +47,8 @@ const Ahorcado = () => {
           </Button>
         </div>
       </div>
+
+      <ApiKeyInput onApiKeySet={handleApiKeySet} />
 
       <CategorySelector
         selectedCategory={categoria}
