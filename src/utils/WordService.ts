@@ -1,45 +1,46 @@
 
 import { toast } from "@/components/ui/use-toast";
+import { pipeline } from "@huggingface/transformers";
 
-const PERPLEXITY_API_KEY = ""; // This should be provided by the user
+let textGenerator: any = null;
+
+const initializeModel = async () => {
+  if (!textGenerator) {
+    try {
+      textGenerator = await pipeline(
+        'text-generation',
+        'Xenova/gpt2-spanish',
+        { device: 'cpu' }
+      );
+    } catch (error) {
+      console.error("Error initializing model:", error);
+      throw new Error("No se pudo inicializar el modelo");
+    }
+  }
+  return textGenerator;
+};
 
 export const getRandomWordByCategory = async (category: string): Promise<string> => {
   try {
-    console.log(`Fetching word for category: ${category}`);
+    const generator = await initializeModel();
     
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online',
-        messages: [
-          {
-            role: 'system',
-            content: 'Eres un generador de palabras. Debes generar UNA SOLA palabra en español, sin tildes, relacionada con la categoría dada. La palabra debe tener máximo 12 letras. Responde solo con la palabra, sin explicaciones ni puntuación.'
-          },
-          {
-            role: 'user',
-            content: `Dame una palabra de la categoría: ${category}`
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 50
-      }),
+    const prompt = `Genera una palabra en español sin tildes de la categoría ${category}. La palabra debe ser:`;
+    const result = await generator(prompt, {
+      max_new_tokens: 20,
+      temperature: 0.7,
+      do_sample: true,
     });
 
-    if (!response.ok) {
-      throw new Error('Error en la respuesta de la API');
-    }
-
-    const data = await response.json();
-    const word = data.choices[0].message.content.trim().toLowerCase();
+    let word = result[0].generated_text
+      .split(' ')
+      .pop()
+      ?.toLowerCase()
+      .trim()
+      .replace(/[^a-z]/g, '') || 'ahorcado';
 
     // Verificar longitud y caracteres válidos
     if (word.length > 12) {
-      return word.substring(0, 12);
+      word = word.substring(0, 12);
     }
 
     // Remover tildes y caracteres especiales
