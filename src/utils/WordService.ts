@@ -1,35 +1,22 @@
 
 import { toast } from "@/components/ui/use-toast";
 
-let apiKey: string | null = null;
-
-export const setApiKey = (key: string) => {
-  apiKey = key;
-};
+const LM_STUDIO_URL = 'http://localhost:1234/v1/chat/completions';
 
 export const getRandomWordByCategory = async (category: string): Promise<string> => {
-  if (!apiKey) {
-    toast({
-      title: "Error",
-      description: "Por favor, ingresa una API Key de Google Gemini",
-      variant: "destructive"
-    });
-    return "ahorcado";
-  }
-
   try {
-    // La URL correcta para la API Gemini
-    const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=' + apiKey, {
+    const response = await fetch(LM_STUDIO_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `Dame una palabra en español de no más de 12 letras y no menos de 6, relacionada con ${category}. IMPORTANTE: Solo devuelve la palabra, sin ningún otro texto ni explicación.`
-          }]
-        }]
+        messages: [{
+          role: 'user',
+          content: `Dame una palabra en español de no más de 12 letras y no menos de 6, relacionada con ${category}. IMPORTANTE: Solo devuelve la palabra, sin ningún otro texto ni explicación.`
+        }],
+        model: 'local-model',
+        temperature: 0.7
       })
     });
 
@@ -40,12 +27,12 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
       throw new Error('Error al obtener la palabra');
     }
     
-    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+    if (!data.choices?.[0]?.message?.content) {
       console.error("Formato de respuesta inesperado:", data);
       throw new Error('Formato de respuesta inesperado');
     }
 
-    let word = data.candidates[0].content.parts[0].text
+    let word = data.choices[0].message.content
       .toLowerCase()
       .trim()
       .replace(/[^a-záéíóúñ]/g, '');
