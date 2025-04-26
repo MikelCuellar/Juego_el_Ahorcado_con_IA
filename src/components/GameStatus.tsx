@@ -59,10 +59,11 @@ const GameStatus: React.FC<GameStatusProps> = ({
         onClick={onReiniciar}
         disabled={isLoading}
       >
-        {isLoading ? 'Cargando...' : estadoJuego !== 'jugando' ? 'Jugar de Nuevo' : 'Reiniciar Juego'}
+        {isLoading ? 'Cargando...' : estadoJuego !== 'jugando' ? 'Iniciar Juego' : 'Iniciar Juego'}
       </Button>
     </div>
   );
 };
 
 export default GameStatus;
+
