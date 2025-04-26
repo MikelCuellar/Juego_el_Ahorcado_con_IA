@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -8,9 +7,7 @@ import Dibujo from '@/components/Dibujo';
 import SoundsManager from '@/utils/SoundsManager';
 import palabras from '@/utils/palabras';
 
-// Componente principal del juego Ahorcado
 const Ahorcado = () => {
-  // Estado para controlar el juego
   const [palabraSecreta, setPalabraSecreta] = useState<string>(''); // Palabra a adivinar
   const [letrasAdivinadas, setLetrasAdivinadas] = useState<Set<string>>(new Set()); // Letras ya intentadas
   const [intentosRestantes, setIntentosRestantes] = useState<number>(6); // Intentos fallidos permitidos
@@ -18,51 +15,38 @@ const Ahorcado = () => {
   const [estadoJuego, setEstadoJuego] = useState<'jugando' | 'victoria' | 'derrota'>('jugando'); // Estado actual del juego
   const { toast } = useToast();
   
-  // Referencia al gestor de sonidos
   const soundsManager = useRef<SoundsManager | null>(null);
 
-  // Inicializar el gestor de sonidos al montar el componente
   useEffect(() => {
     soundsManager.current = new SoundsManager();
     return () => {
-      // Limpiar recursos de audio al desmontar
       soundsManager.current?.unload();
     };
   }, []);
 
-  // Inicializar el juego al cargar el componente
   useEffect(() => {
     iniciarJuego();
   }, []);
 
-  // Función para seleccionar una palabra aleatoria e inicializar el juego
   const iniciarJuego = () => {
-    // Seleccionar una palabra aleatoria
     const palabraAleatoria = palabras[Math.floor(Math.random() * palabras.length)];
     setPalabraSecreta(palabraAleatoria.toUpperCase());
     
-    // Reiniciar estados
     setLetrasAdivinadas(new Set());
     setIntentosRestantes(6);
     setEstadoJuego('jugando');
     
-    // Inicializar la palabra mostrada con guiones
     setPalabraMostrada(Array(palabraAleatoria.length).fill('_'));
   };
 
-  // Función para manejar cuando se pulsa una letra
   const manejarLetra = (letra: string) => {
-    // Si el juego ya terminó o la letra ya fue adivinada, no hacemos nada
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
 
-    // Añadir la letra a las letras adivinadas
     const nuevasLetrasAdivinadas = new Set(letrasAdivinadas);
     nuevasLetrasAdivinadas.add(letra);
     setLetrasAdivinadas(nuevasLetrasAdivinadas);
 
-    // Comprobar si la letra está en la palabra
     if (palabraSecreta.includes(letra)) {
-      // Actualizar la palabra mostrada
       const nuevaPalabraMostrada = [...palabraMostrada];
       for (let i = 0; i < palabraSecreta.length; i++) {
         if (palabraSecreta[i] === letra) {
@@ -71,10 +55,8 @@ const Ahorcado = () => {
       }
       setPalabraMostrada(nuevaPalabraMostrada);
 
-      // Reproducir sonido de acierto
       soundsManager.current?.playSound('correcto');
 
-      // Comprobar victoria
       if (!nuevaPalabraMostrada.includes('_')) {
         setEstadoJuego('victoria');
         soundsManager.current?.playSound('victoria');
@@ -85,14 +67,11 @@ const Ahorcado = () => {
         });
       }
     } else {
-      // Reproducir sonido de error
       soundsManager.current?.playSound('incorrecto');
       
-      // Reducir intentos restantes
       const nuevosIntentosRestantes = intentosRestantes - 1;
       setIntentosRestantes(nuevosIntentosRestantes);
 
-      // Comprobar derrota
       if (nuevosIntentosRestantes === 0) {
         setEstadoJuego('derrota');
         soundsManager.current?.playSound('derrota');
@@ -106,7 +85,6 @@ const Ahorcado = () => {
     }
   };
 
-  // Renderizar el juego
   return (
     <Card className="w-full max-w-4xl p-6 bg-white shadow-lg rounded-xl">
       <div className="text-center mb-6">
@@ -117,23 +95,27 @@ const Ahorcado = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Área de dibujo del ahorcado */}
         <div className="flex justify-center items-center">
           <Dibujo intentosFallidos={6 - intentosRestantes} />
         </div>
 
         <div className="flex flex-col justify-between">
-          {/* Palabra a adivinar */}
           <div className="mb-6 text-center">
-            <div className="text-3xl font-bold tracking-widest my-4">
-              {palabraMostrada.join(' ')}
+            <div className="text-3xl font-bold tracking-widest my-4 flex justify-center items-center space-x-3">
+              {palabraMostrada.map((letra, index) => (
+                <span 
+                  key={index} 
+                  className="w-10 h-12 border-b-4 border-gray-400 flex items-center justify-center"
+                >
+                  {letra}
+                </span>
+              ))}
             </div>
             <p className="text-lg text-gray-700 mt-2">
               Intentos restantes: <span className="font-bold">{intentosRestantes}</span>
             </p>
           </div>
 
-          {/* Teclado virtual */}
           <div className="mb-6">
             <Teclado 
               letrasAdivinadas={letrasAdivinadas} 
@@ -142,7 +124,6 @@ const Ahorcado = () => {
             />
           </div>
 
-          {/* Mensajes y botón de reinicio */}
           <div className="text-center">
             {estadoJuego === 'victoria' && (
               <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-md">
