@@ -6,6 +6,7 @@ import Teclado from '@/components/Teclado';
 import Dibujo from '@/components/Dibujo';
 import SoundsManager from '@/utils/SoundsManager';
 import palabras from '@/utils/palabras';
+
 const Ahorcado = () => {
   const [palabraSecreta, setPalabraSecreta] = useState<string>(''); // Palabra a adivinar
   const [letrasAdivinadas, setLetrasAdivinadas] = useState<Set<string>>(new Set()); // Letras ya intentadas
@@ -72,7 +73,8 @@ const Ahorcado = () => {
       }
     }
   };
-  return <Card className="w-full max-w-4xl p-6 bg-white shadow-lg rounded-2xl">
+
+  return <Card className="w-full max-w-6xl p-6 bg-white shadow-lg rounded-2xl">
       <div className="text-center mb-6">
         <h1 className="text-4xl font-bold mb-2 text-gray-800">Juego del Ahorcado</h1>
         <p className="text-gray-600">
@@ -87,10 +89,15 @@ const Ahorcado = () => {
 
         <div className="flex flex-col justify-between">
           <div className="mb-6 text-center">
-            <div className="text-3xl font-bold tracking-widest my-4 flex justify-center items-center space-x-3">
-              {palabraMostrada.map((letra, index) => <span key={index} className="w-10 h-12 border-b-4 border-gray-400 flex items-center justify-center">
+            <div className="text-3xl font-bold tracking-widest my-4 flex justify-center items-center space-x-4">
+              {palabraMostrada.map((letra, index) => (
+                <span 
+                  key={index} 
+                  className="w-12 h-14 border-b-4 border-gray-400 flex items-center justify-center text-center"
+                >
                   {letra}
-                </span>)}
+                </span>
+              ))}
             </div>
             <p className="text-lg text-gray-700 mt-2">
               Intentos restantes: <span className="font-bold">{intentosRestantes}</span>
@@ -118,4 +125,5 @@ const Ahorcado = () => {
       </div>
     </Card>;
 };
+
 export default Ahorcado;
