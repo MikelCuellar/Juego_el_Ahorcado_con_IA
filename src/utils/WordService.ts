@@ -24,7 +24,7 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
   try {
     const generator = await initializeModel();
     
-    const prompt = `Genera una palabra en español sin tildes de la categoría ${category}. La palabra debe ser:`;
+    const prompt = `Dame 1, una y solo una palabra de no mas de 12 letras y no menos de 6, relacionadas con el tema ${category}`;
     const result = await generator(prompt, {
       max_new_tokens: 20,
       temperature: 0.7,
