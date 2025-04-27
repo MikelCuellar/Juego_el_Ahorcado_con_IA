@@ -47,6 +47,14 @@ export const useAhorcadoGame = () => {
     }
   };
 
+  const reiniciarJuego = () => {
+    setPalabraSecreta('');
+    setLetrasAdivinadas(new Set());
+    setIntentosRestantes(0);
+    setPalabraMostrada([]);
+    setEstadoJuego('jugando');
+  };
+
   const manejarLetra = (letra: string, soundsManager: any) => {
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
     
@@ -89,7 +97,6 @@ export const useAhorcadoGame = () => {
       if (nuevosIntentosRestantes === 0) {
         setEstadoJuego('derrota');
         soundsManager?.playSound('derrota');
-        setCategoria('');
         toast({
           title: "¡Has perdido!",
           description: `La palabra era: ${palabraSecreta}`,
@@ -110,6 +117,7 @@ export const useAhorcadoGame = () => {
     categoria,
     setCategoria,
     fetchPalabraSecreta,
+    reiniciarJuego,
     manejarLetra
   };
 };

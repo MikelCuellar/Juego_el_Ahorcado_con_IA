@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,12 +25,19 @@ const Ahorcado = () => {
 
   const { isMuted, soundsManager, toggleMute } = useAhorcadoSounds();
 
+  const handleRestart = () => {
+    // Si el juego ha terminado o no ha empezado, permitir cambiar categoría
+    if (estadoJuego !== 'jugando' || palabraSecreta === '') {
+      fetchPalabraSecreta();
+    }
+  };
+
   return (
     <Card className="w-full max-w-6xl p-6 bg-white shadow-lg rounded-2xl">
       <div className="text-center mb-6">
         <h1 className="text-4xl font-bold mb-2 text-gray-800">Juego del Ahorcado</h1>
         <p className="text-gray-600">
-          Adivina la palabra letra por letra. Tienes {intentosRestantes} intentos.
+          Adivina la palabra letra por letra. Tienes {intentosRestantes || "?"} intentos.
         </p>
         <div className="flex justify-center gap-2 mt-2">
           <Button 
@@ -45,7 +53,7 @@ const Ahorcado = () => {
       <CategorySelector
         selectedCategory={categoria}
         onSelect={setCategoria}
-        disabled={isLoading || estadoJuego !== 'jugando'}
+        disabled={isLoading || (estadoJuego === 'jugando' && palabraSecreta !== '')}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -60,7 +68,7 @@ const Ahorcado = () => {
             intentosRestantes={intentosRestantes}
             estadoJuego={estadoJuego}
             palabraSecreta={palabraSecreta}
-            onReiniciar={fetchPalabraSecreta}
+            onReiniciar={handleRestart}
             isLoading={isLoading}
           />
 
@@ -68,7 +76,7 @@ const Ahorcado = () => {
             <Teclado 
               letrasAdivinadas={letrasAdivinadas} 
               onLetraClick={(letra) => manejarLetra(letra, soundsManager)}
-              deshabilitado={isLoading || estadoJuego !== 'jugando'} 
+              deshabilitado={isLoading || estadoJuego !== 'jugando' || palabraSecreta === ''} 
             />
           </div>
         </div>
