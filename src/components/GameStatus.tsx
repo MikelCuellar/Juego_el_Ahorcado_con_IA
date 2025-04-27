@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 interface GameStatusProps {
   palabraMostrada: string[];
@@ -8,7 +8,6 @@ interface GameStatusProps {
   estadoJuego: 'jugando' | 'victoria' | 'derrota';
   palabraSecreta: string;
   onReiniciar: () => void;
-  isLoading: boolean;
 }
 
 const GameStatus: React.FC<GameStatusProps> = ({
@@ -17,6 +16,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
   intentosRestantes,
   estadoJuego,
   palabraSecreta,
+  onReiniciar
 }) => {
   return (
     <div className="mb-6 text-center">
@@ -47,6 +47,17 @@ const GameStatus: React.FC<GameStatusProps> = ({
         <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
           ¡Has perdido! La palabra era: <strong>{palabraSecreta}</strong>
         </div>
+      )}
+
+      {(estadoJuego === 'victoria' || estadoJuego === 'derrota') && (
+        <Button 
+          variant="default" 
+          size="lg" 
+          className="mt-2 bg-purple-500 hover:bg-purple-600" 
+          onClick={onReiniciar}
+        >
+          Reiniciar Juego
+        </Button>
       )}
     </div>
   );

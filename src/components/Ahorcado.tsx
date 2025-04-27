@@ -24,6 +24,10 @@ const Ahorcado = () => {
 
   const { isMuted, soundsManager, toggleMute } = useAhorcadoSounds();
 
+  const reiniciarJuego = () => {
+    setCategoria('');  // Resetear categoría
+  };
+
   return (
     <Card className="w-full max-w-6xl p-6 bg-white shadow-lg rounded-2xl">
       <div className="text-center mb-6">
@@ -60,7 +64,7 @@ const Ahorcado = () => {
             intentosRestantes={intentosRestantes}
             estadoJuego={estadoJuego}
             palabraSecreta={palabraSecreta}
-            onReiniciar={fetchPalabraSecreta}
+            onReiniciar={reiniciarJuego}
             isLoading={isLoading}
           />
 
