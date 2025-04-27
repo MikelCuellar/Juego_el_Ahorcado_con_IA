@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -8,6 +9,7 @@ interface GameStatusProps {
   estadoJuego: 'jugando' | 'victoria' | 'derrota';
   palabraSecreta: string;
   onReiniciar: () => void;
+  isLoading: boolean;
 }
 
 const GameStatus: React.FC<GameStatusProps> = ({
@@ -16,7 +18,8 @@ const GameStatus: React.FC<GameStatusProps> = ({
   intentosRestantes,
   estadoJuego,
   palabraSecreta,
-  onReiniciar
+  onReiniciar,
+  isLoading
 }) => {
   return (
     <div className="mb-6 text-center">
