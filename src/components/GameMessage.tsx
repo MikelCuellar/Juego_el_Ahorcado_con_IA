@@ -36,7 +36,7 @@ const GameMessage: React.FC<GameMessageProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 items-center">
+    <div className="flex flex-col gap-5 items-center">
       {getMessage()}
       <Button 
         variant="default"
