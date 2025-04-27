@@ -27,9 +27,12 @@ export const useAhorcadoGame = () => {
     setIsLoading(true);
     try {
       const palabra = await getRandomWordByCategory(categoria);
-      setPalabraSecreta(palabra);
-      setIntentosRestantes(Math.min(palabra.length, 12));
-      setPalabraMostrada(Array(palabra.length).fill('_'));
+      const palabraNormalizada = palabra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      
+      console.log("Palabra normalizada:", palabraNormalizada);
+      setPalabraSecreta(palabraNormalizada);
+      setIntentosRestantes(Math.min(palabraNormalizada.length, 12));
+      setPalabraMostrada(Array(palabraNormalizada.length).fill('_'));
       setLetrasAdivinadas(new Set());
       setEstadoJuego('jugando');
     } catch (error) {
@@ -47,22 +50,32 @@ export const useAhorcadoGame = () => {
   const manejarLetra = (letra: string, soundsManager: any) => {
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
     
+    // Convertir la letra a minúsculas y normalizarla (eliminar acentos)
+    letra = letra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    console.log(`Validando letra: ${letra} en palabra: ${palabraSecreta}`);
+    
     soundsManager?.playSound('tecla');
     
     const nuevasLetrasAdivinadas = new Set(letrasAdivinadas);
     nuevasLetrasAdivinadas.add(letra);
     setLetrasAdivinadas(nuevasLetrasAdivinadas);
     
+    // Verificar si la letra está en la palabra (sin considerar mayús/minús o acentos)
     if (palabraSecreta.includes(letra)) {
       const nuevaPalabraMostrada = [...palabraMostrada];
+      
+      // Actualiza todas las posiciones donde aparece la letra
       for (let i = 0; i < palabraSecreta.length; i++) {
         if (palabraSecreta[i] === letra) {
           nuevaPalabraMostrada[i] = letra;
         }
       }
+      
       setPalabraMostrada(nuevaPalabraMostrada);
       soundsManager?.playSound('correcto');
       
+      // Verificar victoria (no quedan guiones)
       if (!nuevaPalabraMostrada.includes('_')) {
         setEstadoJuego('victoria');
         soundsManager?.playSound('victoria');
@@ -77,6 +90,7 @@ export const useAhorcadoGame = () => {
       const nuevosIntentosRestantes = intentosRestantes - 1;
       setIntentosRestantes(nuevosIntentosRestantes);
       
+      // Verificar derrota
       if (nuevosIntentosRestantes === 0) {
         setEstadoJuego('derrota');
         soundsManager?.playSound('derrota');

@@ -49,11 +49,7 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
       return "ahorcado";
     }
 
-    // Remover tildes y caracteres especiales
-    return word.normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z]/g, "");
-
+    return word;
   } catch (error) {
     console.error("Error al obtener la palabra:", error);
     toast({
