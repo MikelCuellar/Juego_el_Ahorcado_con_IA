@@ -1,7 +1,7 @@
 
 import { toast } from "@/components/ui/use-toast";
 
-const OPEN_WEBUI_URL = 'https://aps.pregps.cl:3000/v1/chat/completions';
+const OPEN_WEBUI_URL = 'http://aps.pregps.cl:3000/v1/chat/completions';
 
 export const getRandomWordByCategory = async (category: string): Promise<string> => {
   try {
