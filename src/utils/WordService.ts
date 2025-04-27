@@ -1,11 +1,11 @@
 
 import { toast } from "@/components/ui/use-toast";
 
-const LM_STUDIO_URL = 'http://localhost:1234/v1/chat/completions';
+const OPEN_WEBUI_URL = 'https://aps.pregps.cl:3000/v1/chat/completions';
 
 export const getRandomWordByCategory = async (category: string): Promise<string> => {
   try {
-    const response = await fetch(LM_STUDIO_URL, {
+    const response = await fetch(OPEN_WEBUI_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
     const data = await response.json();
     
     if (!response.ok) {
-      console.error("Error API response:", data);
+      console.error("Error en la respuesta de la API:", data);
       throw new Error('Error al obtener la palabra');
     }
     
@@ -55,7 +55,7 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
       .replace(/[^a-z]/g, "");
 
   } catch (error) {
-    console.error("Error fetching word:", error);
+    console.error("Error al obtener la palabra:", error);
     toast({
       title: "Error",
       description: "No se pudo obtener una palabra. Usando palabra predeterminada.",
