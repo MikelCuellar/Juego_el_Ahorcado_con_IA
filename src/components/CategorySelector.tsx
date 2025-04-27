@@ -21,7 +21,10 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   return (
     <div className="mb-4">
       <Label htmlFor="category-input" className="mb-2 block text-gray-700">
-        Escribe una categoría
+        {disabled && selectedCategory ? 
+          "Juego en curso" : 
+          "Escribe una categoría para comenzar"
+        }
       </Label>
       <Input
         id="category-input"

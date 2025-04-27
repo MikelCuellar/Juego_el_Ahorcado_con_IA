@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { getRandomWordByCategory } from '@/utils/WordService';
@@ -50,7 +49,6 @@ export const useAhorcadoGame = () => {
   const manejarLetra = (letra: string, soundsManager: any) => {
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
     
-    // Convertir la letra a minúsculas y normalizarla (eliminar acentos)
     letra = letra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
     console.log(`Validando letra: ${letra} en palabra: ${palabraSecreta}`);
@@ -61,11 +59,9 @@ export const useAhorcadoGame = () => {
     nuevasLetrasAdivinadas.add(letra);
     setLetrasAdivinadas(nuevasLetrasAdivinadas);
     
-    // Verificar si la letra está en la palabra (sin considerar mayús/minús o acentos)
     if (palabraSecreta.includes(letra)) {
       const nuevaPalabraMostrada = [...palabraMostrada];
       
-      // Actualiza todas las posiciones donde aparece la letra
       for (let i = 0; i < palabraSecreta.length; i++) {
         if (palabraSecreta[i] === letra) {
           nuevaPalabraMostrada[i] = letra;
@@ -75,7 +71,6 @@ export const useAhorcadoGame = () => {
       setPalabraMostrada(nuevaPalabraMostrada);
       soundsManager?.playSound('correcto');
       
-      // Verificar victoria (no quedan guiones)
       if (!nuevaPalabraMostrada.includes('_')) {
         setEstadoJuego('victoria');
         soundsManager?.playSound('victoria');
@@ -90,10 +85,10 @@ export const useAhorcadoGame = () => {
       const nuevosIntentosRestantes = intentosRestantes - 1;
       setIntentosRestantes(nuevosIntentosRestantes);
       
-      // Verificar derrota
       if (nuevosIntentosRestantes === 0) {
         setEstadoJuego('derrota');
         soundsManager?.playSound('derrota');
+        setCategoria('');
         toast({
           title: "¡Has perdido!",
           description: `La palabra era: ${palabraSecreta}`,
