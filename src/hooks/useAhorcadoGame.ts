@@ -1,21 +1,30 @@
 
 import { useState } from 'react';
-import { useToast } from '@/components/ui/use-toast';
-import { getRandomWordByCategory } from '@/utils/WordService';
+import { useToast } from '@/hooks/use-toast';
+import { EstadoJuego } from '@/models/AhorcadoTypes';
+import { SolicitarCategoria } from '@/game/SolicitarCategoria';
+import { EsconderPalabra } from '@/game/EsconderPalabra';
+import { ValidarLetraIngresada } from '@/game/ValidarLetraIngresada';
+import { ContadorDeVidas } from '@/game/ContadorDeVidas';
+import { soundService } from '@/services/SoundService';
 
 export const useAhorcadoGame = () => {
   const [palabraSecreta, setPalabraSecreta] = useState<string>('');
   const [letrasAdivinadas, setLetrasAdivinadas] = useState<Set<string>>(new Set());
   const [intentosRestantes, setIntentosRestantes] = useState<number>(0);
   const [palabraMostrada, setPalabraMostrada] = useState<string[]>([]);
-  const [estadoJuego, setEstadoJuego] = useState<'jugando' | 'victoria' | 'derrota'>('jugando');
+  const [estadoJuego, setEstadoJuego] = useState<EstadoJuego>('jugando');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [categoria, setCategoria] = useState<string>("");
   
   const { toast } = useToast();
 
+  // Solicitar palabra basada en categoría
   const fetchPalabraSecreta = async () => {
-    if (!categoria.trim()) {
+    const solicitador = new SolicitarCategoria();
+    solicitador.setCategoria(categoria);
+    
+    if (!solicitador.esValida()) {
       toast({
         title: "Error",
         description: "Por favor, ingresa una categoría antes de comenzar",
@@ -26,15 +35,25 @@ export const useAhorcadoGame = () => {
 
     setIsLoading(true);
     try {
-      const palabra = await getRandomWordByCategory(categoria);
-      const palabraNormalizada = palabra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      
-      console.log("Palabra normalizada:", palabraNormalizada);
-      setPalabraSecreta(palabraNormalizada);
-      setIntentosRestantes(Math.min(palabraNormalizada.length, 12));
-      setPalabraMostrada(Array(palabraNormalizada.length).fill('_'));
-      setLetrasAdivinadas(new Set());
-      setEstadoJuego('jugando');
+      const palabra = await solicitador.pedirPalabraIA();
+      if (palabra) {
+        const palabraNormalizada = palabra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        
+        console.log("Palabra normalizada:", palabraNormalizada);
+        setPalabraSecreta(palabraNormalizada);
+        
+        // Iniciar contador de vidas
+        const contador = new ContadorDeVidas(palabraNormalizada);
+        setIntentosRestantes(contador.getVidas());
+        
+        // Preparar palabra mostrada
+        const escondedor = new EsconderPalabra(palabraNormalizada);
+        setPalabraMostrada(escondedor.mostrarPalabra(new Set()));
+        
+        // Reiniciar letras y estado
+        setLetrasAdivinadas(new Set());
+        setEstadoJuego('jugando');
+      }
     } catch (error) {
       console.error("Error al obtener palabra:", error);
       toast({
@@ -47,42 +66,36 @@ export const useAhorcadoGame = () => {
     }
   };
 
-  const reiniciarJuego = () => {
-    setPalabraSecreta('');
-    setLetrasAdivinadas(new Set());
-    setIntentosRestantes(0);
-    setPalabraMostrada([]);
-    setEstadoJuego('jugando');
-  };
-
-  const manejarLetra = (letra: string, soundsManager: any) => {
+  const manejarLetra = (letra: string) => {
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
     
-    const letraNormalizada = letra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    // Validar letra ingresada
+    const validador = new ValidarLetraIngresada(letra);
+    const letraNormalizada = validador.getLetra();
     
     console.log(`Validando letra: ${letraNormalizada} en palabra: ${palabraSecreta}`);
     
-    soundsManager?.playSound('tecla');
+    // Reproducir sonido de tecla
+    soundService.emitirSonido('tecla');
     
+    // Agregar letra a las adivinadas
     const nuevasLetrasAdivinadas = new Set(letrasAdivinadas);
     nuevasLetrasAdivinadas.add(letra);
     setLetrasAdivinadas(nuevasLetrasAdivinadas);
     
-    if (palabraSecreta.includes(letraNormalizada)) {
-      const nuevaPalabraMostrada = [...palabraMostrada];
-      
-      for (let i = 0; i < palabraSecreta.length; i++) {
-        if (palabraSecreta[i] === letraNormalizada) {
-          nuevaPalabraMostrada[i] = letraNormalizada;
-        }
-      }
-      
+    if (validador.coincideCon(palabraSecreta)) {
+      // Actualizar palabra mostrada
+      const escondedor = new EsconderPalabra(palabraSecreta);
+      const nuevaPalabraMostrada = escondedor.mostrarPalabra(nuevasLetrasAdivinadas);
       setPalabraMostrada(nuevaPalabraMostrada);
-      soundsManager?.playSound('correcto');
       
-      if (!nuevaPalabraMostrada.includes('_')) {
+      // Reproducir sonido correcto
+      soundService.emitirSonidoAcierto();
+      
+      // Verificar victoria
+      if (validador.esComplecion(nuevaPalabraMostrada)) {
         setEstadoJuego('victoria');
-        soundsManager?.playSound('victoria');
+        soundService.emitirSonidoVictoria();
         toast({
           title: "¡Felicidades!",
           description: `Has adivinado la palabra: ${palabraSecreta}`,
@@ -90,13 +103,17 @@ export const useAhorcadoGame = () => {
         });
       }
     } else {
-      soundsManager?.playSound('incorrecto');
-      const nuevosIntentosRestantes = intentosRestantes - 1;
-      setIntentosRestantes(nuevosIntentosRestantes);
+      // Letra incorrecta
+      soundService.emitirSonidoError();
       
-      if (nuevosIntentosRestantes === 0) {
+      // Actualizar intentos
+      const nuevoIntentosRestantes = intentosRestantes - 1;
+      setIntentosRestantes(nuevoIntentosRestantes);
+      
+      // Verificar derrota
+      if (nuevoIntentosRestantes === 0) {
         setEstadoJuego('derrota');
-        soundsManager?.playSound('derrota');
+        soundService.emitirSonidoDerrota();
         toast({
           title: "¡Has perdido!",
           description: `La palabra era: ${palabraSecreta}`,
@@ -117,7 +134,6 @@ export const useAhorcadoGame = () => {
     categoria,
     setCategoria,
     fetchPalabraSecreta,
-    reiniciarJuego,
     manejarLetra
   };
 };
