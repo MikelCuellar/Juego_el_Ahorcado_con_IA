@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 
 interface GameStatusProps {
   palabraMostrada: string[];
@@ -18,8 +17,6 @@ const GameStatus: React.FC<GameStatusProps> = ({
   intentosRestantes,
   estadoJuego,
   palabraSecreta,
-  onReiniciar,
-  isLoading
 }) => {
   return (
     <div className="mb-6 text-center">
@@ -51,19 +48,8 @@ const GameStatus: React.FC<GameStatusProps> = ({
           ¡Has perdido! La palabra era: <strong>{palabraSecreta}</strong>
         </div>
       )}
-      
-      <Button 
-        variant="default" 
-        size="lg" 
-        className="mt-2 bg-purple-500 hover:bg-purple-600" 
-        onClick={onReiniciar}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Cargando...' : estadoJuego !== 'jugando' ? 'Iniciar Juego' : 'Iniciar Juego'}
-      </Button>
     </div>
   );
 };
 
 export default GameStatus;
-

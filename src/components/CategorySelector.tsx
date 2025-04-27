@@ -8,12 +8,14 @@ interface CategorySelectorProps {
   onSelect: (category: string) => void;
   selectedCategory: string;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({
   onSelect,
   selectedCategory,
-  disabled = false
+  disabled = false,
+  isLoading = false
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSelect(e.target.value);
@@ -21,9 +23,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && selectedCategory.trim() !== '') {
-      // Prevent default to stop form submission if inside a form
       e.preventDefault();
-      // Trigger the onSelect function with the current category
       onSelect(selectedCategory);
     }
   };
@@ -49,9 +49,10 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
         />
         <Button 
           onClick={() => onSelect(selectedCategory)}
-          disabled={disabled || !selectedCategory.trim()}
+          disabled={disabled || !selectedCategory.trim() || isLoading}
+          className="bg-purple-500 hover:bg-purple-600"
         >
-          Iniciar
+          {isLoading ? 'Cargando...' : disabled ? 'Iniciar Juego' : 'Iniciar'}
         </Button>
       </div>
     </div>
@@ -59,4 +60,3 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 };
 
 export default CategorySelector;
-
