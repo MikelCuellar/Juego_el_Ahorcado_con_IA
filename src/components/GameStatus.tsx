@@ -51,19 +51,19 @@ const GameStatus: React.FC<GameStatusProps> = ({
           ¡Has perdido! La palabra era: <strong>{palabraSecreta}</strong>
         </div>
       )}
-
-      {(estadoJuego === 'victoria' || estadoJuego === 'derrota') && (
-        <Button 
-          variant="default" 
-          size="lg" 
-          className="mt-2 bg-purple-500 hover:bg-purple-600" 
-          onClick={onReiniciar}
-        >
-          Reiniciar Juego
-        </Button>
-      )}
+      
+      <Button 
+        variant="default" 
+        size="lg" 
+        className="mt-2 bg-purple-500 hover:bg-purple-600" 
+        onClick={onReiniciar}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Cargando...' : estadoJuego !== 'jugando' ? 'Iniciar Juego' : 'Iniciar Juego'}
+      </Button>
     </div>
   );
 };
 
 export default GameStatus;
+
