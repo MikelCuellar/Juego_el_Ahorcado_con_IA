@@ -6,13 +6,15 @@ interface InputLetraProps {
   letrasAdivinadas: Set<string>;
   onLetraIngresada: (letra: string) => void;
   deshabilitado: boolean;
+  palabraSecreta: string; // Añadiendo la palabra secreta como prop
 }
 
 // Componente para ingresar letras 
 const InputLetra: React.FC<InputLetraProps> = ({ 
   letrasAdivinadas, 
   onLetraIngresada, 
-  deshabilitado 
+  deshabilitado,
+  palabraSecreta
 }) => {
   const filas = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -21,8 +23,8 @@ const InputLetra: React.FC<InputLetraProps> = ({
   ];
 
   const isLetraCorrecta = (letra: string): boolean => {
-    const palabraSecreta = document.querySelector('[data-palabra-secreta]')?.textContent?.toLowerCase() || '';
-    return palabraSecreta.includes(letra.toLowerCase());
+    if (!palabraSecreta) return false;
+    return palabraSecreta.toLowerCase().includes(letra.toLowerCase());
   };
 
   // Manejador de eventos del teclado

@@ -6,9 +6,15 @@ interface TecladoProps {
   letrasAdivinadas: Set<string>;
   onLetraClick: (letra: string) => void;
   deshabilitado: boolean;
+  palabraSecreta: string; // Añadiendo la palabra secreta como prop
 }
 
-const Teclado: React.FC<TecladoProps> = ({ letrasAdivinadas, onLetraClick, deshabilitado }) => {
+const Teclado: React.FC<TecladoProps> = ({ 
+  letrasAdivinadas, 
+  onLetraClick, 
+  deshabilitado,
+  palabraSecreta 
+}) => {
   const filas = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ'],
@@ -16,8 +22,8 @@ const Teclado: React.FC<TecladoProps> = ({ letrasAdivinadas, onLetraClick, desha
   ];
 
   const isLetraCorrecta = (letra: string): boolean => {
-    const palabraSecreta = document.querySelector('[data-palabra-secreta]')?.textContent?.toLowerCase() || '';
-    return palabraSecreta.includes(letra.toLowerCase());
+    if (!palabraSecreta) return false;
+    return palabraSecreta.toLowerCase().includes(letra.toLowerCase());
   };
 
   // Manejador de eventos del teclado

@@ -76,7 +76,8 @@ const PintarJuego = () => {
             <InputLetra 
               letrasAdivinadas={letrasAdivinadas} 
               onLetraIngresada={(letra) => manejarLetra(letra)}
-              deshabilitado={isLoading || estadoJuego !== 'jugando' || palabraSecreta === ''} 
+              deshabilitado={isLoading || estadoJuego !== 'jugando' || palabraSecreta === ''}
+              palabraSecreta={palabraSecreta}
             />
           </div>
         </div>
