@@ -1,6 +1,5 @@
 
 import { palabraService } from "@/services/PalabraService";
-import { useToast } from "@/hooks/use-toast";
 
 // Clase para solicitar palabras basadas en una categoría
 export class SolicitarCategoria {
@@ -24,24 +23,15 @@ export class SolicitarCategoria {
   // Solicita una palabra a la API basada en la categoría
   async pedirPalabraIA(): Promise<string> {
     if (!this.esValida()) {
-      const { toast } = useToast();
-      toast({
-        title: "Error",
-        description: "Por favor, ingresa una categoría antes de comenzar",
-        variant: "destructive"
-      });
+      // Usar return para manejar el error sin hook
+      console.error("Categoría no válida");
       return "";
     }
     
     const resultado = await palabraService.peticionarIA(this.categoria);
     
     if (resultado.error) {
-      const { toast } = useToast();
-      toast({
-        title: "Error",
-        description: resultado.error,
-        variant: "destructive"
-      });
+      console.error("Error al obtener palabra:", resultado.error);
     }
     
     return resultado.palabra;

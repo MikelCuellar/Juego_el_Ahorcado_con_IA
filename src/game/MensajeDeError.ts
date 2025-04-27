@@ -1,6 +1,4 @@
 
-import { useToast } from "@/hooks/use-toast";
-
 // Clase para mostrar mensajes de error
 export class MensajeDeError {
   private tipoMensaje: string;
@@ -9,15 +7,8 @@ export class MensajeDeError {
     this.tipoMensaje = tipo;
   }
   
-  // Muestra un mensaje de error
+  // Registra un mensaje de error en la consola
   mostrarMensaje(mensaje: string): void {
-    const { toast } = useToast();
-    
-    toast({
-      title: "Error",
-      description: mensaje,
-      variant: "destructive",
-      duration: 5000
-    });
+    console.error(`[${this.tipoMensaje}] Error: ${mensaje}`);
   }
 }
