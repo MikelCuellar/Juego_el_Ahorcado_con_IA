@@ -20,13 +20,13 @@ const GameMessage: React.FC<GameMessageProps> = ({
     switch (estadoJuego) {
       case 'victoria':
         return (
-          <div className="p-2 bg-green-100 text-green-800 rounded-md text-sm">
+          <div className="p-2 bg-green-100 text-green-800 rounded-md text-sm mb-5">
             ¡Felicidades! Palabra: <strong>{palabraSecreta}</strong>
           </div>
         );
       case 'derrota':
         return (
-          <div className="p-2 bg-red-100 text-red-800 rounded-md text-sm">
+          <div className="p-2 bg-red-100 text-red-800 rounded-md text-sm mb-5">
             ¡Perdiste! Palabra: <strong>{palabraSecreta}</strong>
           </div>
         );
