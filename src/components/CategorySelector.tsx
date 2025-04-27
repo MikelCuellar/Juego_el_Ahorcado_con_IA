@@ -2,6 +2,7 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface CategorySelectorProps {
   onSelect: (category: string) => void;
@@ -35,16 +36,24 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           "Escribe una categoría para comenzar"
         }
       </Label>
-      <Input
-        id="category-input"
-        type="text"
-        value={selectedCategory}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        disabled={disabled}
-        placeholder="Ej: animales, deportes, países..."
-        className="w-full"
-      />
+      <div className="flex gap-2 items-center">
+        <Input
+          id="category-input"
+          type="text"
+          value={selectedCategory}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          placeholder="Ej: animales, deportes, países..."
+          className="w-1/2"
+        />
+        <Button 
+          onClick={() => onSelect(selectedCategory)}
+          disabled={disabled || !selectedCategory.trim()}
+        >
+          Iniciar
+        </Button>
+      </div>
     </div>
   );
 };
