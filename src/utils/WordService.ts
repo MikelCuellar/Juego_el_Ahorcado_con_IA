@@ -1,7 +1,14 @@
 
 import { toast } from "@/components/ui/use-toast";
+import palabras from '@/utils/palabras';
 
 const OPEN_WEBUI_URL = 'http://aps.pregps.cl:3000/v1/chat/completions';
+
+const getRandomWordFromList = (category: string): string => {
+  // Get a random word from our local list
+  const randomIndex = Math.floor(Math.random() * palabras.length);
+  return palabras[randomIndex];
+};
 
 export const getRandomWordByCategory = async (category: string): Promise<string> => {
   try {
@@ -24,12 +31,12 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
     
     if (!response.ok) {
       console.error("Error en la respuesta de la API:", data);
-      throw new Error('Error al obtener la palabra');
+      return getRandomWordFromList(category);
     }
     
     if (!data.choices?.[0]?.message?.content) {
       console.error("Formato de respuesta inesperado:", data);
-      throw new Error('Formato de respuesta inesperado');
+      return getRandomWordFromList(category);
     }
 
     let word = data.choices[0].message.content
@@ -44,19 +51,20 @@ export const getRandomWordByCategory = async (category: string): Promise<string>
       word = word.substring(0, 12);
     }
 
-    // Si la palabra es muy corta, usar palabra por defecto
+    // Si la palabra es muy corta, usar palabra aleatoria de la lista
     if (word.length < 6) {
-      return "ahorcado";
+      return getRandomWordFromList(category);
     }
 
     return word;
   } catch (error) {
     console.error("Error al obtener la palabra:", error);
     toast({
-      title: "Error",
-      description: "No se pudo obtener una palabra. Usando palabra predeterminada.",
-      variant: "destructive"
+      title: "Usando palabra local",
+      description: "No se pudo conectar a la IA. Usando palabra de la lista local.",
+      variant: "default"
     });
-    return "ahorcado";
+    return getRandomWordFromList(category);
   }
 };
+
