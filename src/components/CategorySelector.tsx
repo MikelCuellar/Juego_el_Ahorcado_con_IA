@@ -28,7 +28,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
         type="text"
         value={selectedCategory}
         onChange={handleChange}
-        disabled={disabled && estadoJuego === 'jugando'}
+        disabled={disabled}
         placeholder="Ej: animales, deportes, países..."
         className="w-full"
       />
