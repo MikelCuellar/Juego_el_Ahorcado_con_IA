@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { getRandomWordByCategory } from '@/utils/WordService';
@@ -35,7 +36,7 @@ export const useAhorcadoGame = () => {
       setLetrasAdivinadas(new Set());
       setEstadoJuego('jugando');
     } catch (error) {
-      console.error("Error fetching word:", error);
+      console.error("Error al obtener palabra:", error);
       toast({
         title: "Error",
         description: "Error al obtener palabra. Intenta de nuevo.",
@@ -49,9 +50,9 @@ export const useAhorcadoGame = () => {
   const manejarLetra = (letra: string, soundsManager: any) => {
     if (estadoJuego !== 'jugando' || letrasAdivinadas.has(letra)) return;
     
-    letra = letra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const letraNormalizada = letra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
-    console.log(`Validando letra: ${letra} en palabra: ${palabraSecreta}`);
+    console.log(`Validando letra: ${letraNormalizada} en palabra: ${palabraSecreta}`);
     
     soundsManager?.playSound('tecla');
     
@@ -59,12 +60,12 @@ export const useAhorcadoGame = () => {
     nuevasLetrasAdivinadas.add(letra);
     setLetrasAdivinadas(nuevasLetrasAdivinadas);
     
-    if (palabraSecreta.includes(letra)) {
+    if (palabraSecreta.includes(letraNormalizada)) {
       const nuevaPalabraMostrada = [...palabraMostrada];
       
       for (let i = 0; i < palabraSecreta.length; i++) {
-        if (palabraSecreta[i] === letra) {
-          nuevaPalabraMostrada[i] = letra;
+        if (palabraSecreta[i] === letraNormalizada) {
+          nuevaPalabraMostrada[i] = letraNormalizada;
         }
       }
       

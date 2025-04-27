@@ -57,8 +57,8 @@ const Teclado: React.FC<TecladoProps> = ({ letrasAdivinadas, onLetraClick, desha
                 className={`h-12 w-12 text-lg font-medium transition-all ${
                   yaAdivinada 
                     ? esCorrecta 
-                      ? 'bg-green-600 text-white hover:bg-green-600' 
-                      : 'bg-red-200 text-gray-700 hover:bg-red-200'
+                      ? 'bg-green-600 text-white hover:bg-green-700' 
+                      : 'bg-red-200 text-gray-700 hover:bg-red-300'
                     : 'hover:bg-purple-100'
                 }`}
                 disabled={yaAdivinada || deshabilitado}
