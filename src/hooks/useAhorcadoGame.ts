@@ -6,7 +6,7 @@ import { getRandomWordByCategory } from '@/utils/WordService';
 export const useAhorcadoGame = () => {
   const [palabraSecreta, setPalabraSecreta] = useState<string>('');
   const [letrasAdivinadas, setLetrasAdivinadas] = useState<Set<string>>(new Set());
-  const [intentosRestantes, setIntentosRestantes] = useState<number>(6);
+  const [intentosRestantes, setIntentosRestantes] = useState<number>(0);
   const [palabraMostrada, setPalabraMostrada] = useState<string[]>([]);
   const [estadoJuego, setEstadoJuego] = useState<'jugando' | 'victoria' | 'derrota'>('jugando');
   const [isLoading, setIsLoading] = useState<boolean>(false);
