@@ -23,7 +23,11 @@ const Teclado: React.FC<TecladoProps> = ({
 
   const isLetraCorrecta = (letra: string): boolean => {
     if (!palabraSecreta) return false;
-    return palabraSecreta.toLowerCase().includes(letra.toLowerCase());
+    
+    const letraNormalizada = letra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const palabraNormalizada = palabraSecreta.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    return palabraNormalizada.includes(letraNormalizada);
   };
 
   // Manejador de eventos del teclado

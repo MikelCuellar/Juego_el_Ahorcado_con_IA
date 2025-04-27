@@ -21,7 +21,7 @@ const MostrarLetra: React.FC<MostrarLetraProps> = ({
             key={index} 
             className="w-12 h-14 border-b-4 border-gray-400 flex items-center justify-center text-center"
           >
-            {letra}
+            {letra !== '_' ? letra : ''}
           </span>
         ))}
       </div>

@@ -29,7 +29,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
             key={index} 
             className="w-12 h-14 border-b-4 border-gray-400 flex items-center justify-center text-center"
           >
-            {letra}
+            {letra !== '_' ? letra : ''}
           </span>
         ))}
       </div>
@@ -66,4 +66,3 @@ const GameStatus: React.FC<GameStatusProps> = ({
 };
 
 export default GameStatus;
-

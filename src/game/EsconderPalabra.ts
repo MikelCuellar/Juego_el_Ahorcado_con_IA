@@ -17,8 +17,15 @@ export class EsconderPalabra {
     if (!this.palabra) return [];
     
     return Array.from(this.palabra).map(letra => {
+      // Normalize the letter to handle accents
       const letraNormalizada = letra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      return letrasAdivinadas.has(letraNormalizada) ? letraNormalizada : '_';
+      
+      // Check if the letter has been guessed
+      if (Array.from(letrasAdivinadas).some(l => 
+          l.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === letraNormalizada)) {
+        return letra;
+      }
+      return '_';
     });
   }
 }

@@ -83,7 +83,8 @@ export const useAhorcadoGame = () => {
     nuevasLetrasAdivinadas.add(letra);
     setLetrasAdivinadas(nuevasLetrasAdivinadas);
     
-    if (validador.coincideCon(palabraSecreta)) {
+    // Verificar si la letra está en la palabra
+    if (palabraSecreta.includes(letraNormalizada)) {
       // Actualizar palabra mostrada
       const escondedor = new EsconderPalabra(palabraSecreta);
       const nuevaPalabraMostrada = escondedor.mostrarPalabra(nuevasLetrasAdivinadas);
@@ -92,8 +93,8 @@ export const useAhorcadoGame = () => {
       // Reproducir sonido correcto
       soundService.emitirSonidoAcierto();
       
-      // Verificar victoria
-      if (validador.esComplecion(nuevaPalabraMostrada)) {
+      // Verificar victoria - si no hay guiones en la palabra mostrada
+      if (!nuevaPalabraMostrada.includes('_')) {
         setEstadoJuego('victoria');
         soundService.emitirSonidoVictoria();
         toast({

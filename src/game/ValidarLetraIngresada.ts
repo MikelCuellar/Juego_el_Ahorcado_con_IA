@@ -14,7 +14,8 @@ export class ValidarLetraIngresada {
   
   // Verifica si la letra coincide con alguna de la palabra
   coincideCon(palabra: string): boolean {
-    return palabra.includes(this.letraIngresada);
+    const palabraNormalizada = palabra.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return palabraNormalizada.includes(this.letraIngresada);
   }
   
   // Verifica si todas las letras han sido adivinadas (juego completado)
