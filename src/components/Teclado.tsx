@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface TecladoProps {
@@ -18,6 +19,28 @@ const Teclado: React.FC<TecladoProps> = ({ letrasAdivinadas, onLetraClick, desha
     const palabraSecreta = document.querySelector('[data-palabra-secreta]')?.textContent?.toLowerCase() || '';
     return palabraSecreta.includes(letra.toLowerCase());
   };
+
+  // Manejador de eventos del teclado
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if (deshabilitado) return;
+    
+    const letra = event.key.toUpperCase();
+    const todasLasLetras = filas.flat();
+    
+    if (todasLasLetras.includes(letra) && !letrasAdivinadas.has(letra)) {
+      onLetraClick(letra);
+    }
+  };
+
+  useEffect(() => {
+    // Agregar el event listener cuando el componente se monta
+    window.addEventListener('keyup', handleKeyPress);
+    
+    // Limpiar el event listener cuando el componente se desmonta
+    return () => {
+      window.removeEventListener('keyup', handleKeyPress);
+    };
+  }, [deshabilitado, letrasAdivinadas]); // Re-agregar el listener cuando estas dependencias cambien
 
   return (
     <div className="flex flex-col items-center gap-2">
