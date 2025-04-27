@@ -75,7 +75,7 @@ const Ahorcado = () => {
           <div className="mb-6">
             <Teclado 
               letrasAdivinadas={letrasAdivinadas} 
-              onLetraClick={(letra) => manejarLetra(letra, soundsManager)}
+              onLetraClick={(letra) => manejarLetra(letra)}
               deshabilitado={isLoading || estadoJuego !== 'jugando' || palabraSecreta === ''} 
             />
           </div>
